@@ -1,0 +1,2 @@
+aiogram==3.18.0
+instagrapi==2.1.3
