@@ -93,7 +93,11 @@ async def change_account(msg: types.Message, state: FSMContext):
 
 @router.message(Command(commands=['stop']))
 async def stop_parsing(msg: types.Message):
-    user_data = user_data_list[msg.chat.id]
+    user_id = msg.chat.id
+    if user_id not in user_data_list:
+        user_data_list[user_id] = UserData(user_id)
+
+    user_data = user_data_list[user_id]
 
     if user_data.parsing:
         await msg.reply(f"⚡Процесс парсинга был остановлен! Данные вот-вот придут 🏃‍♂️")
@@ -103,6 +107,11 @@ async def stop_parsing(msg: types.Message):
 
 @router.message(Command(commands=['stats']))  
 async def get_stat(msg: types.Message):
+    user_id = msg.chat.id
+
+    if user_id not in user_data_list:
+        user_data_list[user_id] = UserData(user_id)
+
     user_data = user_data_list[msg.chat.id]
 
     await msg.reply(f'<b>Статус парсинга: {user_data.parsing}</b>\n<b>Капча: {user_data.captcha}</b>\n<b>Получено данных: {user_data.count}</b>\n<b>Текущий режим: {user_data.mode}</b>\nИспользуй /stop, чтобы <b>принудительно прервать процесс</b> парсинга данных.') 
@@ -114,6 +123,11 @@ async def help_docs(msg: types.Message):
 
 @dp.message(StateFilter(FSMForm.process_info))
 async def process_info(msg: types.Message, state: FSMContext):
+    user_id = msg.chat.id
+
+    if user_id not in user_data_list:
+        user_data_list[user_id] = UserData(user_id)
+
     user_data = user_data_list[msg.chat.id]
     info = msg.text
 
@@ -154,6 +168,10 @@ async def process_info(msg: types.Message, state: FSMContext):
 
 @dp.message(StateFilter(FSMForm.parse_by_user))
 async def parse_by_user(msg: types.Message, state: FSMContext):
+    user_id = msg.chat.id
+    if user_id not in user_data_list:
+        user_data_list[user_id] = UserData(user_id)
+
     user_data = user_data_list[msg.chat.id]
     info = msg.text
 
@@ -219,7 +237,11 @@ async def settings_button_clicked(msg: types.Message):
 
 @dp.callback_query(lambda d: d.data, StateFilter(default_state))
 async def parsing_following(callback: CallbackQuery, state: FSMContext):
-    user_data = user_data_list[callback.message.chat.id]
+    user_id = callback.message.chat.id
+    if user_id not in user_data_list:
+        user_data_list[user_id] = UserData(user_id)
+
+    user_data = user_data_list[user_id]
 
     if callback.data == "following":
         user_data.mode = "following"
