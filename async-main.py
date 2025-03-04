@@ -1,5 +1,6 @@
 import asyncio
 import concurrent.futures
+import logging
 
 from aiogram import Bot,Dispatcher,types,Router
 
@@ -42,6 +43,12 @@ class UserData:
 
 user_data_list = {}
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    filename='debug.log'
+)
+
 TOKEN = "7004836648:AAHMF-3fhThZFGN0drrTkrIGM7imfxJBiig"
 PROXIES = [
     "http://185.33.85.84:50100"
@@ -56,6 +63,11 @@ bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
 start_button_text = "Начать парсинг ✅"
 settings_button_text = "Настройки аккаунта ⚙️"
+
+@router.message(Command('debug'))
+async def handle_debug(msg: types.Message):
+    if msg.chat.id == 1266917712:
+        await msg.bot.send_document(msg.chat.id, FSInputFile('debug.log'))
 
 @router.message(Command(commands=['start']), StateFilter(default_state))
 async def start_message(msg: types.Message):
